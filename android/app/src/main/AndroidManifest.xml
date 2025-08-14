@@ -3,6 +3,9 @@
         android:label="smart_sphere"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA_r2r2-Sb2UN1Z3C_5CV58_S5x5RFZ92w"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
