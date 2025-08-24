@@ -50,7 +50,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                  child: InkWell(
                    borderRadius: BorderRadius.circular(25), // Ensures ripple effect respects rounded corners
                    onTap: () {
-                     Navigator.push(context, MaterialPageRoute(builder: (_)=> LoginScreen(fromScreen: "Operation Team")));
+                    // Navigator.push(context, MaterialPageRoute(builder: (_)=> LoginScreen(fromScreen: "Operation Team")));
 
                    },
                    child: Container(
@@ -93,7 +93,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                  child: InkWell(
                    borderRadius: BorderRadius.circular(25), // Ensures ripple effect respects rounded corners
                    onTap: () {
-                   Navigator.push(context, MaterialPageRoute(builder: (_)=>  LoginScreen(fromScreen: "Customer")));
+                 //  Navigator.push(context, MaterialPageRoute(builder: (_)=>  LoginScreen(fromScreen: "Customer")));
                    },
                    child: Container(
                      width: 200,
@@ -139,7 +139,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                  child: InkWell(
                    borderRadius: BorderRadius.circular(25), // Ensures ripple effect respects rounded corners
                    onTap: () {
-                     Navigator.push(context, MaterialPageRoute(builder: (_)=>  LoginScreen(fromScreen: "Fire Tracker")));
+                   //  Navigator.push(context, MaterialPageRoute(builder: (_)=>  LoginScreen(fromScreen: "Fire Tracker")));
 
                    },
                    child: Container(
@@ -181,7 +181,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                  child: InkWell(
                    borderRadius: BorderRadius.circular(25), // Ensures ripple effect respects rounded corners
                    onTap: () {
-                     Navigator.push(context, MaterialPageRoute(builder: (_)=> LoginScreen(fromScreen: "Ambulance")));
+                     //Navigator.push(context, MaterialPageRoute(builder: (_)=> LoginScreen(fromScreen: "Ambulance")));
                    },
                    child: Container(
                      width: 200,
@@ -228,7 +228,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           InkWell(
                borderRadius: BorderRadius.circular(25), // Ensures ripple effect respects rounded corners
                onTap: () {
-                 Navigator.push(context, MaterialPageRoute(builder: (_)=> LoginScreen(fromScreen: "Admin")));
+                 //Navigator.push(context, MaterialPageRoute(builder: (_)=> LoginScreen(fromScreen: "Admin")));
 
                },
                child: Container(

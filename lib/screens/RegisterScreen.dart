@@ -152,7 +152,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 InkWell(
                   borderRadius: BorderRadius.circular(25), // Ensures ripple effect respects rounded corners
                   onTap: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen(fromScreen: "")));
+                  //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen(fromScreen: "")));
                   },
                   child: Container(
                     width: 200,

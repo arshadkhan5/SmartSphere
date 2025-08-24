@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_sphere/screens/DashboardScreen.dart';
+import 'package:smart_sphere/screens/LoginScreen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,8 +40,11 @@ class _SplashScreenState extends State<SplashScreen> {
               InkWell(
                 borderRadius: BorderRadius.circular(25), // Ensures ripple effect respects rounded corners
                 onTap: () {
-                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DashboardScreen()));
+                  // if prefrence null show login screen
+                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+                 //else  get detail from  prefrence
                 },
+
                 child: Container(
                   width: 200,
                   height: 50,

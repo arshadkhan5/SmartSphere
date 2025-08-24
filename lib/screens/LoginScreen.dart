@@ -6,14 +6,15 @@ import 'package:smart_sphere/screens/AdminScreen.dart';
 import 'package:smart_sphere/screens/AmbulanceScreen.dart';
 import 'package:smart_sphere/screens/CustomerScreen.dart';
 import 'package:smart_sphere/screens/DashboardScreen.dart';
+import 'package:smart_sphere/screens/FireFighterDashboard.dart';
 import 'package:smart_sphere/screens/FireFighterScreen.dart';
 import 'package:smart_sphere/screens/OperationTeamScreen.dart';
 import 'package:smart_sphere/screens/RegisterScreen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  final String fromScreen ;
+ /* final String fromScreen ;*/
 
-   const LoginScreen(   {super.key ,required this.fromScreen});
+   const LoginScreen(   {super.key ,/*required this.fromScreen*/});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -31,10 +32,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final usernameController = TextEditingController();
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
+    bool _obscurePassword = true; // Add this line
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Login  ${widget.fromScreen}" ,style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold),),
+        title: Text("Login  " ,style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold),),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -55,113 +57,155 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           key: formKey,
           child: Column(
             children: [
-              const SizedBox(height: 10),
-
+              // Logo at the top
               const SizedBox(height: 20),
-
-                // Regular login fields
-                TextFormField(
-                  controller: usernameController,
-                  decoration: InputDecoration(
-                    labelText:"User Name",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "User name Required";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: const BorderSide(color:Color(0xFFFF0007), width: 2.0),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
-                    ),
-                  ),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Password Required";
-                    }
-                    return null;
-                  },
-                ),
-
-
-              const SizedBox(height: 30),
-
-              InkWell(
-                borderRadius: BorderRadius.circular(25), // Ensures ripple effect respects rounded corners
-                onTap: () {
-                  switch (widget.fromScreen){
-                    case 'Operation Team' : Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OperationTeamScreen()));
-                    case 'Customer' : Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => CustomerScreen()));
-                    case 'Fire Tracker' : Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => FireFighterScreen()));
-                    case 'Ambulance' : Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AmbulanceScreen()));
-                    case 'Admin' : Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AdminScreen()));
-
-                  }
-
-
-                 // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DashboardScreen()));
-                },
-                child: Container(
-                  width: 200,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFFFF0007), // Red
-                        Color(0xFFFF0068), // Pinkish red
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(25), // Rounded corners
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Login",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+              Container(
+                alignment: Alignment.center,
+                child: Image.asset(
+                  'assets/splash_icon.png', // Replace with your actual logo path
+                  height: 150, // Adjust height as needed
+                  width: 150, // Adjust width as needed
                 ),
               ),
-              SizedBox(height: 20,),
+              const SizedBox(height: 40),
 
-              TextButton(
+              // Regular login fields
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: usernameController,
+                      decoration: InputDecoration(
+                        labelText: "User Name",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                          borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                          borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                          borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "User name Required";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        return TextFormField(
+                          controller: passwordController,
+                          decoration: InputDecoration(
+                            labelText: "Password",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                              borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                              borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                              borderSide: const BorderSide(color: Color(0xFFFF0007), width: 2.0),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                color: Color(0xFFFF0007),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
+                          ),
+                          obscureText: _obscurePassword,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Password Required";
+                            }
+                            return null;
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 30),
+
+                    InkWell(
+                      borderRadius: BorderRadius.circular(10), // Ensures ripple effect respects rounded corners
+                      onTap: () {
+                        if (formKey.currentState!.validate()) {
+                          String username = usernameController.text.trim().toLowerCase();
+                          String password = passwordController.text.trim();
+
+                          if (username == 'customer' && password == '1234') {
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => CustomerScreen()));
+                          }
+                          else if (username == 'firefighter' && password == '1234') {
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => FireFighterDashboard()));
+                          }
+                          else if (username == 'ambulance' && password == '1234') {
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AmbulanceScreen()));
+                          }
+                          else if (username == 'admin' && password == '1234') {
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AdminScreen()));
+                          }
+                          else if (username == 'operation' && password == '1234') {
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OperationTeamScreen()));
+                          }
+                          else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Invalid username or password')),
+                            );
+                          }
+                        }
+                      },
+                      child: Container(
+                        width: 200,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFFFF0007), // Red
+                              Color(0xFFFF0068), // Pinkish red
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(25), // Rounded corners
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Login",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                  ],
+                ),
+              ),
+
+
+             /* TextButton(
                 onPressed: () {
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => RegisterScreen()));
                 },
                 child: Text('Create Account',
                   style: const TextStyle(color: Colors.blue),
                 ),
-              ),
-
+              ),*/
             ],
           ),
         ),
