@@ -1,3 +1,4 @@
+/*
 // background_service.dart
 import 'package:workmanager/workmanager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,20 +22,22 @@ void callbackDispatcher() {
 }
 
 Future<void> _checkForNewAlerts() async {
-  final prefs = await SharedPreferences.getInstance();
-  final lastChecked = prefs.getString('lastAlertCheck') ?? DateTime.now().toIso8601String();
+  //final prefs = await SharedPreferences.getInstance();
+  //final lastChecked = prefs.getString('lastAlertCheck') ?? DateTime.now().toIso8601String();
 
   final alertService = AlertService();
-  final newAlerts = await alertService.checkForNewAlerts(lastChecked);
+  //final newAlerts = await alertService.checkForNewAlerts(lastChecked);
 
-  for (final alert in newAlerts) {
-    if (!alert.isExpired) {
-      await NotificationService.showAlertNotification(alert);
-    }
+*/
+/*  for (final alert in newAlerts) {
+    // if (!alert.isExpired) {
+    //   await NotificationService.showAlertNotification(alert);
+    // }
   }
 
   await prefs.setString('lastAlertCheck', DateTime.now().toIso8601String());
-}
+}*//*
+
 
 class BackgroundService {
   static Future<void> initialize() async {
@@ -97,4 +100,4 @@ class BackgroundService {
       await _checkForNewAlerts();
     }
   }
-}
+}*/

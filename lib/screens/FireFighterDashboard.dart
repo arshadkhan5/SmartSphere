@@ -33,13 +33,13 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
 
   Future<void> _initializeServices() async {
     // Initialize notifications
-    await NotificationService.initialize();
+   // await NotificationService.initialize();
 
     // Initialize background service
-    await BackgroundService.initialize();
+   // await BackgroundService.initialize();
 
     // Start background service for firefighters
-    await BackgroundService.startBackgroundService();
+   // await BackgroundService.startBackgroundService();
 
     // Load initial alerts
     ref.read(alertsProvider.notifier).loadAlerts();
@@ -164,10 +164,10 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
             icon: Icon(backgroundServiceRunning ? Icons.notifications_active : Icons.notifications_off),
             onPressed: () async {
               if (backgroundServiceRunning) {
-                await BackgroundService.stopBackgroundService();
+              //  await BackgroundService.stopBackgroundService();
                 ref.read(backgroundServiceProvider.notifier).state = false;
               } else {
-                await BackgroundService.startBackgroundService();
+               // await BackgroundService.startBackgroundService();
                 ref.read(backgroundServiceProvider.notifier).state = true;
               }
             },
