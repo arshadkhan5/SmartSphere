@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_sphere/screens/LoginScreen.dart';
 import '../model/Alert.dart';
 import '../providers/AlertServiceProvider.dart';
 import '../services/BackgroundService.dart';
@@ -173,6 +174,51 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
             },
           ),
         ],
+
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              child: Container(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: AssetImage("assets/splash_icon.png"),
+                    ),
+                    SizedBox(height: 20,),
+                    Text("FIRE FIGHTER " , style: TextStyle(fontWeight: FontWeight.bold),),
+
+                  ],
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon ( Icons.home),
+              title: Text("Home"),
+              onTap: (){
+                Navigator.pop(context);
+              },
+
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text("Setting"),
+              onTap: (){
+                Navigator.pop(context);
+
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text("Log Out"),
+              onTap: (){
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> LoginScreen()));
+              },
+            )
+          ],
+        ),
       ),
       body: TabBarView(
         controller: _tabController,
