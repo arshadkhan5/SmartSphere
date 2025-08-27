@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/app_localizations.dart';
+
 class ReportIncidentScreen extends ConsumerStatefulWidget {
   const ReportIncidentScreen({super.key});
 
@@ -20,7 +22,7 @@ class _CustomerScreenState extends ConsumerState<ReportIncidentScreen> {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text("Report Incident", style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+        title: Text(AppLocalizations.of(context)!.reportIncident, style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -40,7 +42,7 @@ class _CustomerScreenState extends ConsumerState<ReportIncidentScreen> {
         child: Column(
           children: [
             Container(
-              child: Text("Report Incident Logic Here "),
+              child: Text(AppLocalizations.of(context)!.reportIncident),
             )
           ],
 

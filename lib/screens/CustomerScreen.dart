@@ -5,6 +5,9 @@ import 'package:smart_sphere/screens/CreateAlertScreen.dart';
 import 'package:smart_sphere/screens/ManageSensorScreen.dart';
 import 'package:smart_sphere/screens/ReportIncidentScreen.dart';
 
+import '../l10n/app_localizations.dart';
+import 'LoginScreen.dart';
+
 class CustomerScreen extends ConsumerStatefulWidget {
   const CustomerScreen({super.key});
 
@@ -24,7 +27,7 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text("Customers", style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+        title: Text(AppLocalizations.of(context)!.customers, style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -36,6 +39,50 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
               end: Alignment.bottomCenter,
             ),
           ),
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              child: Container(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: AssetImage("assets/splash_icon.png"),
+                    ),
+                    SizedBox(height: 20,),
+                    Text(AppLocalizations.of(context)!.customers , style: TextStyle(fontWeight: FontWeight.bold),),
+
+                  ],
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon ( Icons.home),
+              title: Text("Home"),
+              onTap: (){
+                Navigator.pop(context);
+              },
+
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text("Setting"),
+              onTap: (){
+                Navigator.pop(context);
+
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text(AppLocalizations.of(context)!.logOut),
+              onTap: (){
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> LoginScreen()));
+              },
+            )
+          ],
         ),
       ),
 
@@ -67,13 +114,13 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
                         ),
                         borderRadius: BorderRadius.circular(25), // Rounded corners
                       ),
-                      child: const Center(
+                      child:  Center(
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Create Alert",
+                                AppLocalizations.of(context)!.createAlert,
                                 style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold , fontSize: 16),
                               ),
                               SizedBox(height: 20),
@@ -109,13 +156,13 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
                         ),
                         borderRadius: BorderRadius.circular(25), // Rounded corners
                       ),
-                      child: const Center(
+                      child:  Center(
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Report Incident",
+                                AppLocalizations.of(context)!.reportIncident,
                                 style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold , fontSize: 16),
                               ),
                               SizedBox(height: 20),
@@ -156,14 +203,14 @@ class _CustomerScreenState extends ConsumerState<CustomerScreen> {
                         ),
                         borderRadius: BorderRadius.circular(25), // Rounded corners
                       ),
-                      child: const Center(
+                      child:  Center(
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SizedBox(height: 10),
                               Text(
-                                "Manage Sensor",
+                                AppLocalizations.of(context)!.manageSensor,
                                 style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold , fontSize: 16),
                               ),
                               SizedBox(height: 8),

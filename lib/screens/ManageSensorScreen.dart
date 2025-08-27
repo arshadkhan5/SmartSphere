@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/app_localizations.dart';
+
 class ManageSensorScreen extends ConsumerStatefulWidget {
   const ManageSensorScreen({super.key});
 
@@ -21,7 +23,7 @@ class _ManageSensorScreenState extends ConsumerState<ManageSensorScreen> {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text("Manage Sensor ", style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+        title: Text(AppLocalizations.of(context)!.manageSensor, style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -41,7 +43,7 @@ class _ManageSensorScreenState extends ConsumerState<ManageSensorScreen> {
         child: Column(
           children: [
             Container(
-              child: Text("Manage Sensor Logic Here "),
+              child: Text(AppLocalizations.of(context)!.manageSensor),
             )
           ],
 

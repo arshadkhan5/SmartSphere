@@ -1,48 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_sphere/screens/SplashScreen.dart';
+import 'package:smart_sphere/services/LocalizationService.dart';
 
-void main() {
+import 'l10n/app_localizations.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp( const ProviderScope(
-    child: MyApp(),
-  ),);
 
+
+  final locale = await LocalizationService.getLocale();
+
+  // Replace with actual app
+  runApp(ProviderScope(child: MyApp(locale: locale)));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
 
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
+  final Locale locale;
+
+  MyApp({super.key, required this.locale});
+
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+
+  static _MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>();
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale? _locale;
+
+  @override
+  void initState() {
+    super.initState();
+    _locale = widget.locale;
+  }
+
+  void setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Smart Sphere',
+      themeMode: ThemeMode.dark,
+      locale: _locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('ar'), // Arabic
+      ],
+      onGenerateTitle: (context) =>
+      AppLocalizations.of(context)?.appTitle ?? 'Smart Sphere',
 
-      theme: ThemeData(
-        scaffoldBackgroundColor: Color(0xFFF1F2F8),
-
-        appBarTheme: AppBarTheme(
-          iconTheme: IconThemeData(color: Colors.white),
-        ),
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-
-      ),
       home: const SplashScreen(),
     );
   }

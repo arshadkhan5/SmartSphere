@@ -1,7 +1,9 @@
 // AlertDetailScreen.dart
 import 'package:flutter/material.dart';
 import 'package:smart_sphere/model/Alert.dart';
-import 'package:smart_sphere/screens/FireFighterScreen.dart'; // Your existing map screen
+import 'package:smart_sphere/screens/FireFighterScreen.dart';
+
+import '../l10n/app_localizations.dart'; // Your existing map screen
 
 class AlertDetailScreen extends StatelessWidget {
   final Alert alert;
@@ -10,9 +12,10 @@ class AlertDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Alert Details'),
+        title: Text(localizations.alertDetails),
         flexibleSpace: Container(
           foregroundDecoration: BoxDecoration(
             gradient: LinearGradient(colors: [
@@ -49,18 +52,18 @@ class AlertDetailScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 16),
-                    _buildDetailRow(Icons.location_on, 'Location:', alert.location),
+                    _buildDetailRow(Icons.location_on, '${localizations.location}:', alert.location),
                     SizedBox(height: 8),
-                    _buildDetailRow(Icons.access_time, 'Created:', _formatDateTime(alert.createdAt)),
+                    _buildDetailRow(Icons.access_time, '${localizations.created}:', _formatDateTime(alert.createdAt)),
                     if (alert.expiresAt != null)
                       Column(
                         children: [
                           SizedBox(height: 8),
-                          _buildDetailRow(Icons.timer_off, 'Expires:', _formatDateTime(alert.expiresAt!)),
+                          _buildDetailRow(Icons.timer_off, '${localizations.expired}:', _formatDateTime(alert.expiresAt!)),
                         ],
                       ),
                     SizedBox(height: 8),
-                    _buildDetailRow(Icons.info, 'Status:', alert.status.toUpperCase(),
+                    _buildDetailRow(Icons.info, '${localizations.status}:', alert.status.toUpperCase(),
                         color: _getStatusColor(alert.status)),
                   ],
                 ),
@@ -116,7 +119,7 @@ class AlertDetailScreen extends StatelessWidget {
                   );
                 },
                 icon: Icon(Icons.map, color: Colors.white),
-                label: Text('Track Location on Map', style: TextStyle(color: Colors.white)),
+                label: Text(localizations.trackLocationMap, style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),

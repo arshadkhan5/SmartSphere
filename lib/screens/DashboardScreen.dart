@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_sphere/screens/LoginScreen.dart';
 
+import '../l10n/app_localizations.dart';
+
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
@@ -22,7 +24,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
+        title:  Text(AppLocalizations.of(context)!.dashboard, style: TextStyle(color: Colors.white)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -67,13 +69,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                        ),
                        borderRadius: BorderRadius.circular(25), // Rounded corners
                      ),
-                     child: const Center(
+                     child:  Center(
                        child: Center(
                          child: Column(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
                              Text(
-                               "Operation Team",
+                               AppLocalizations.of(context)!.operationTeam,
                                style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold , fontSize: 16),
                              ),
                              SizedBox(height: 10),
@@ -109,13 +111,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                        ),
                        borderRadius: BorderRadius.circular(25), // Rounded corners
                      ),
-                     child: const Center(
+                     child:  Center(
                        child: Center(
                          child: Column(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
                              Text(
-                               "Customer",
+                               AppLocalizations.of(context)!.customers,
                                style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold , fontSize: 16),
                              ),
                              SizedBox(height: 10),
@@ -157,13 +159,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                        borderRadius: BorderRadius.circular(25), // Rounded corners
                      ),
 
-                     child: const Center(
+                     child:  Center(
                        child: Center(
                          child: Column(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
                              Text(
-                               "Fire Tracker",
+                               AppLocalizations.of(context)!.fireTracker,
                                style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold , fontSize: 16),
                              ),
                              SizedBox(height: 10),
@@ -198,13 +200,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                        ),
                        borderRadius: BorderRadius.circular(25), // Rounded corners
                      ),
-                     child: const Center(
+                     child:  Center(
                        child: Center(
                          child: Column(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
                              Text(
-                               "Ambulance",
+                               AppLocalizations.of(context)!.ambulance,
                                style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold , fontSize: 16),
                              ),
                              SizedBox(height: 10),
@@ -245,13 +247,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                    ),
                    borderRadius: BorderRadius.circular(25), // Rounded corners
                  ),
-                 child: const Center(
+                 child:  Center(
                    child: Center(
                      child: Row(
                        mainAxisAlignment: MainAxisAlignment.center,
                        children: [
                          Text(
-                           "Admin",
+                           AppLocalizations.of(context)!.admin,
                            style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold , fontSize: 18),
                          ),
                          SizedBox(width: 30),

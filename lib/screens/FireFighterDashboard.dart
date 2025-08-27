@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_sphere/screens/LoginScreen.dart';
+import '../l10n/app_localizations.dart';
 import '../model/Alert.dart';
 import '../providers/AlertServiceProvider.dart';
 import '../services/BackgroundService.dart';
@@ -134,7 +135,7 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Fire Fighter Dashboard",
+        title: Text(AppLocalizations.of(context)!.fireFighterDashboard,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         flexibleSpace: Container(
@@ -151,15 +152,71 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
         ),
         bottom: TabBar(
           controller: _tabController,
+          labelStyle: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+          unselectedLabelStyle: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
+          labelColor: Color(0xFF0B0A0A),
+          unselectedLabelColor: Colors.grey[100],
+          indicator: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              colors: [Color(0xFFEADADB), Color(0xFFFF0068)],
+                begin: Alignment.topRight,
+                end: Alignment.bottomCenter
+            ),
+          ),
+          indicatorSize: TabBarIndicatorSize.label,
+          indicatorPadding: EdgeInsets.symmetric(vertical: 1, horizontal: -7),
           tabs: [
-            Tab(text: "Active (${activeAlerts.length})"),
-            Tab(text: "Rejected (${ignoredAlerts.length})"),
-            Tab(text: "Cancelled (${cancelledAlerts.length})"),
+            Tab(text: "${AppLocalizations.of(context)!.active} (${activeAlerts.length})"),
+            Tab(text: "${AppLocalizations.of(context)!.ignored} (${ignoredAlerts.length})"),
+            Tab(text: "${AppLocalizations.of(context)!.cancelled} (${cancelledAlerts.length})"),
+          ],
+        )
+        /*TabBar(
+          controller: _tabController,
+          tabs: [
+          *//*  Tab(text: "${AppLocalizations.of(context)!.active} (${activeAlerts.length}) "),
+            Tab(text: "${AppLocalizations.of(context)!.ignored} (${ignoredAlerts.length})"),
+            Tab(text: "${AppLocalizations.of(context)!.cancelled} (${cancelledAlerts.length})"),*//*
+
+            Tab(
+              child: Text(
+                "${AppLocalizations.of(context)!.active} (${activeAlerts.length})",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16, // Adjust size as needed
+                ),
+              ),
+            ),
+            Tab(
+              child: Text(
+                "${AppLocalizations.of(context)!.ignored} (${ignoredAlerts.length})",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16, // Adjust size as needed
+                ),
+              ),
+            ),
+            Tab(
+              child: Text(
+                "${AppLocalizations.of(context)!.cancelled} (${cancelledAlerts.length})",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16, // Adjust size as needed
+                ),
+              ),
+            ),
           ],
           indicatorColor: Colors.white,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white.withOpacity(0.7),
-        ),
+        )*/,
         actions: [
           IconButton(
             icon: Icon(backgroundServiceRunning ? Icons.notifications_active : Icons.notifications_off),
@@ -188,7 +245,7 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
                       backgroundImage: AssetImage("assets/splash_icon.png"),
                     ),
                     SizedBox(height: 20,),
-                    Text("FIRE FIGHTER " , style: TextStyle(fontWeight: FontWeight.bold),),
+                    Text(AppLocalizations.of(context)!.fireTracker , style: TextStyle(fontWeight: FontWeight.bold),),
 
                   ],
                 ),
@@ -212,7 +269,7 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
             ),
             ListTile(
               leading: Icon(Icons.logout),
-              title: Text("Log Out"),
+              title: Text(AppLocalizations.of(context)!.logOut),
               onTap: (){
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> LoginScreen()));
               },
@@ -263,7 +320,7 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
     required bool showCancel,
   }) {
     if (alerts.isEmpty) {
-      return Center(child: Text('No alerts found'));
+      return Center(child: Text(AppLocalizations.of(context)!.noAlertFound));
     }
 
     return ListView.builder(
@@ -339,7 +396,7 @@ class AlertCard extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: Icon(
-            _getStatusIcon(alert.status),
+            _getStatusIcon(alert.status ),
             color: _getStatusColor(alert.status),
             size: 20,
           ),
@@ -489,7 +546,7 @@ class AlertCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            label: Text("Accept", style: TextStyle(fontSize: 13)),
+            label: Text(AppLocalizations.of(context)!.accepted, style: TextStyle(fontSize: 13)),
           ),
         ),
       );
@@ -554,7 +611,7 @@ class AlertCard extends StatelessWidget {
         '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 
-  IconData _getStatusIcon(String status) {
+  IconData _getStatusIcon(String status  ) {
     switch (status.toLowerCase()) {
       case 'active':
         return Icons.warning;

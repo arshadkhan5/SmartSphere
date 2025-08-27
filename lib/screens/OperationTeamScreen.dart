@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/app_localizations.dart';
+
 class OperationTeamScreen extends ConsumerStatefulWidget {
   const OperationTeamScreen({super.key});
 
@@ -21,7 +23,7 @@ class _OperationTeamScreenState extends ConsumerState<OperationTeamScreen> {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text("Operation Team", style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+        title: Text(AppLocalizations.of(context)!.operationTeam, style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -41,7 +43,7 @@ class _OperationTeamScreenState extends ConsumerState<OperationTeamScreen> {
         child: Column(
           children: [
             Container(
-              child: Text("Operation Team Logic Here "),
+              child: Text(AppLocalizations.of(context)!.operationTeam),
             )
 
 

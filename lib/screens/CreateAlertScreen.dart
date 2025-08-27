@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_sphere/model/CreateAlertModel.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/CreateAlertProvider.dart';
 
 class CreateAlertScreen extends ConsumerStatefulWidget {
@@ -31,8 +32,8 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Create Alert",
+        title:  Text(
+          AppLocalizations.of(context)!.createAlert ,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         flexibleSpace: Container(
@@ -52,7 +53,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
           child: ListView(
             children: [
 
-              _buildTextField(_titleController, "Alert Title"),
+              _buildTextField(_titleController, AppLocalizations.of(context)!.alertTitle),
 
               const SizedBox(height: 15),
               DropdownButtonFormField<String>(
@@ -70,7 +71,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                   });
                 },
                 decoration: InputDecoration(
-                  labelText: "Building Name",
+                  labelText: AppLocalizations.of(context)!.buildingName,
                   labelStyle: const TextStyle(
                     color: Colors.blueAccent,
                     fontWeight: FontWeight.bold,
@@ -105,9 +106,9 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
               const SizedBox(height: 15),
               DropdownButtonFormField<String>(
                 value: _selectZone,
-                items: const [
+                items:  [
 
-                  DropdownMenuItem(value: "None", child: Text("None")),
+                  DropdownMenuItem(value: "None", child: Text(AppLocalizations.of(context)!.none)),
                   DropdownMenuItem(value: "Zone 1", child: Text("Zone 1")),
                   DropdownMenuItem(value: "Zone 2", child: Text("Zone 2")),
                   DropdownMenuItem(value: "Zone 3", child: Text("Zone 3")),
@@ -118,7 +119,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                   });
                 },
                 decoration: InputDecoration(
-                  labelText: "Building Zone",
+                  labelText: AppLocalizations.of(context)!.buildingZone,
                   labelStyle: const TextStyle(
                     color: Colors.blueAccent,
                     fontWeight: FontWeight.bold,
@@ -153,12 +154,12 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
               const SizedBox(height: 15),
               DropdownButtonFormField<String>(
                 value: _severityLevel,
-                items: const [
+                items:  [
 
-                  DropdownMenuItem(value: "Low", child: Text(" 🟢 Low")),
-                  DropdownMenuItem(value: "Medium", child: Text("🟠 Medium")),
-                  DropdownMenuItem(value: "High", child: Text("🔴 High")),
-                  DropdownMenuItem(value: "Critical", child: Text(" 🚨 Critical")),
+                  DropdownMenuItem(value: "Low", child: Text(" 🟢 ${AppLocalizations.of(context)!.low}")),
+                  DropdownMenuItem(value: "Medium", child: Text("🟠 ${AppLocalizations.of(context)!.medium}")),
+                  DropdownMenuItem(value: "High", child: Text("🔴 ${AppLocalizations.of(context)!.high}")),
+                  DropdownMenuItem(value: "Critical", child: Text(" 🚨 ${AppLocalizations.of(context)!.critical}")),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -166,7 +167,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                   });
                 },
                 decoration: InputDecoration(
-                  labelText: "Severity Level",
+                  labelText: AppLocalizations.of(context)!.severityLevel,
                   labelStyle: const TextStyle(
                     color: Colors.redAccent,
                     fontWeight: FontWeight.bold,
@@ -201,10 +202,10 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
               const SizedBox(height: 15),
               DropdownButtonFormField<String>(
               value: _selectedType,
-              items: const [
-                DropdownMenuItem(value: "Fire", child: Text("🔥 Fire")),
-                DropdownMenuItem(value: "Smoke", child: Text("💨 Smoke")),
-                DropdownMenuItem(value: "Other", child: Text("⚠️ Other")),
+              items:  [
+                DropdownMenuItem(value: "Fire", child: Text("🔥 ${AppLocalizations.of(context)!.fire}")),
+                DropdownMenuItem(value: "Smoke", child: Text("💨 ${AppLocalizations.of(context)!.smoke}")),
+                DropdownMenuItem(value: "Other", child: Text("⚠️ ${AppLocalizations.of(context)!.other}")),
               ],
               onChanged: (value) {
                 setState(() {
@@ -212,7 +213,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                 });
               },
               decoration: InputDecoration(
-                labelText: "Alert Type",
+                labelText: AppLocalizations.of(context)!.alertType,
                 labelStyle: const TextStyle(
                   color: Colors.redAccent,
                   fontWeight: FontWeight.bold,
@@ -247,7 +248,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
 
 
               const SizedBox(height: 15),
-              _buildTextField(_descriptionController, "Description", maxLines: 4),
+              _buildTextField(_descriptionController, AppLocalizations.of(context)!.description, maxLines: 4),
        /*       const SizedBox(height: 15),
               DropdownButtonFormField<String>(
                 value: _selectAmbulance,
@@ -360,9 +361,9 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                     ),
                     borderRadius: BorderRadius.circular(25),
                   ),
-                  child: const Center(
+                  child:  Center(
                     child: Text(
-                      "Create Alert",
+                      AppLocalizations.of(context)!.createAlert,
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -408,7 +409,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
         )
 
       ),
-      validator: (value) => value!.isEmpty ? "Please enter $label" : null,
+      validator: (value) => value!.isEmpty ?  "${AppLocalizations.of(context)!.createAlert}  $label" : null,
     );
   }
 
@@ -427,7 +428,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
       ref.read(alertProvider.notifier).createAlert(alert).then((_) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("✅ Alert created successfully")),
+             SnackBar(content: Text("✅ ${AppLocalizations.of(context)!.alertCreatedSuccessfully}")),
           );
         }
       });

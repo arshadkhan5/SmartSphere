@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_sphere/l10n/app_localizations.dart';
 
 class AdminScreen  extends ConsumerStatefulWidget {
   const AdminScreen({super.key});
@@ -20,7 +21,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
     return Scaffold(
 
       appBar: AppBar(
-        title: Text("Admin ", style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+        title: Text(AppLocalizations.of(context)!.admin, style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -40,7 +41,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
         child: Column(
           children: [
             Container(
-              child: Text("Admin Logic Here "),
+              child: Text( AppLocalizations.of(context)!.admin),
             )
           ],
 
