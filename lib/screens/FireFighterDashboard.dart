@@ -68,39 +68,50 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
   }
 
   void _handleCancelAlert(String alertId) {
+    final _formKey = GlobalKey<FormState>();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Cancel Alert"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("Are you sure you want to cancel this alert?"),
-              SizedBox(height: 16),
-              TextField(
-                controller: _cancelReasonController,
-                decoration: InputDecoration(
-                  labelText: "Reason for cancellation",
-                  border: OutlineInputBorder(),
+          title: Text(AppLocalizations.of(context)!.cancelAlert),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(AppLocalizations.of(context)!.areYouSureYouCancelAlert),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _cancelReasonController,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.cancellationReason,
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return AppLocalizations.of(context)!.cancellationReasonRequired; // Add this to your localization
+                    }
+                    return null;
+                  },
                 ),
-                maxLines: 3,
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text("No"),
+              child: Text(AppLocalizations.of(context)!.no),
             ),
             ElevatedButton(
               onPressed: () {
-                if (_cancelReasonController.text.isNotEmpty) {
+                if (_formKey.currentState!.validate()) {
                   // Update the alert status to "cancelled" with reason
                   ref.read(alertsProvider.notifier).updateAlertStatus(
                       alertId,
                       "cancelled",
-                      cancelReason: _cancelReasonController.text
+                      cancelReason: _cancelReasonController.text.trim()
                   );
                   _cancelReasonController.clear();
                   Navigator.of(context).pop();
@@ -108,14 +119,11 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Alert cancelled')),
                   );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please provide a reason for cancellation')),
-                  );
                 }
+                // No need for else block - the validator will show the error
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: Text("Yes, Cancel", style: TextStyle(color: Colors.white)),
+              child: Text(AppLocalizations.of(context)!.yesCancel, style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -372,7 +380,7 @@ class AlertCard extends StatelessWidget {
             SizedBox(height: 16),
 
             // Alert content
-            _buildAlertContent(),
+            _buildAlertContent(context),
 
             SizedBox(height: 16),
 
@@ -437,7 +445,7 @@ class AlertCard extends StatelessWidget {
     );
   }
 
-  Widget _buildAlertContent() {
+  Widget _buildAlertContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -475,7 +483,7 @@ class AlertCard extends StatelessWidget {
             Icon(Icons.access_time, size: 16, color: Colors.grey),
             SizedBox(width: 4),
             Text(
-              'Created: ${_formatTime(alert.createdAt)}',
+              '${AppLocalizations.of(context)!.created}: ${_formatTime(alert.createdAt)}',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
@@ -488,7 +496,7 @@ class AlertCard extends StatelessWidget {
               Icon(Icons.timer, size: 16, color: Colors.orange),
               SizedBox(width: 4),
               Text(
-                'Expires: ${_formatTime(alert.expiresAt!)}',
+                '${AppLocalizations.of(context)!.expired}: ${_formatTime(alert.expiresAt!)}',
                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
@@ -567,7 +575,7 @@ class AlertCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            label: Text("Ignore", style: TextStyle(fontSize: 13)),
+            label: Text(AppLocalizations.of(context)!.ignored, style: TextStyle(fontSize: 13)),
           ),
         ),
       );
@@ -588,7 +596,7 @@ class AlertCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            label: Text("Cancel", style: TextStyle(fontSize: 13)),
+            label: Text(AppLocalizations.of(context)!.cancelled, style: TextStyle(fontSize: 13)),
           ),
         ),
       );

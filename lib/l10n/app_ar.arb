@@ -55,5 +55,12 @@
   "register": "التسجيل",
   "fullNameRequired": "الاسم الكامل مطلوب",
   "emailPhoneNumber": "البريد الإلكتروني أو رقم الهاتف",
-  "emailRequired": "البريد الإلكتروني مطلوب"
+  "emailRequired": "البريد الإلكتروني مطلوب",
+  "cancellationReason": "سبب الإلغاء",
+  "cancelAlert": "إلغاء التنبيه",
+  "areYouSureYouCancelAlert": "هل أنت متأكد من أنك تريد إلغاء هذا التنبيه؟",
+  "cancellationReasonRequired": "سبب الإلغاء مطلوب",
+  "no": "لا",
+  "yesCancel": "نعم، إلغاء"
+
 }
