@@ -5,15 +5,19 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:smart_sphere/main.dart';
+import 'package:smart_sphere/services/LocalizationService.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    final locale = await LocalizationService.getLocale();
+    await tester.pumpWidget( MyApp(locale: locale,));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

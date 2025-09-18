@@ -5,6 +5,7 @@ import 'package:smart_sphere/screens/LoginScreen.dart';
 import '../l10n/app_localizations.dart';
 import '../main.dart';
 import '../services/LocalizationService.dart';
+import '../services/NatService.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,9 +18,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
     _navigateToLogin();
   }
-
 
 
   @override

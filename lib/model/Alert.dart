@@ -1,4 +1,3 @@
-// alert.dart
 class Alert {
   final String id;
   final String title;
@@ -8,6 +7,10 @@ class Alert {
   final DateTime createdAt;
   final DateTime? expiresAt;
   final String status;
+  final String? severity;
+  final String? type;
+  final String? zone;
+  final String? buildingName;
   final String? cancelReason;
 
   Alert({
@@ -19,18 +22,14 @@ class Alert {
     required this.createdAt,
     this.expiresAt,
     required this.status,
+    this.severity,
+    this.type,
+    this.zone,
+    this.buildingName,
     this.cancelReason,
   });
 
-  // Getter for formatted address
-  String get location {
-    return 'Lat: $latitude, Long: $longitude';
-  }
-
-  bool get isExpired {
-    if (expiresAt == null) return false;
-    return DateTime.now().isAfter(expiresAt!);
-  }
+  bool get isExpired => expiresAt != null && DateTime.now().isAfter(expiresAt!);
 
   Alert copyWith({
     String? id,
@@ -41,6 +40,10 @@ class Alert {
     DateTime? createdAt,
     DateTime? expiresAt,
     String? status,
+    String? severity,
+    String? type,
+    String? zone,
+    String? buildingName,
     String? cancelReason,
   }) {
     return Alert(
@@ -52,11 +55,37 @@ class Alert {
       createdAt: createdAt ?? this.createdAt,
       expiresAt: expiresAt ?? this.expiresAt,
       status: status ?? this.status,
+      severity: severity ?? this.severity,
+      type: type ?? this.type,
+      zone: zone ?? this.zone,
+      buildingName: buildingName ?? this.buildingName,
       cancelReason: cancelReason ?? this.cancelReason,
     );
   }
 
-  // Convert Alert to JSON for API requests
+  // Add fromJson method
+  factory Alert.fromJson(Map<String, dynamic> json) {
+    return Alert(
+      id: json['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      title: json['title'] ?? 'Unknown Alert',
+      description: json['description'] ?? 'No description',
+      latitude: json['latitude']?.toDouble() ?? 0.0,
+      longitude: json['longitude']?.toDouble() ?? 0.0,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      expiresAt: json['expiresAt'] != null
+          ? DateTime.parse(json['expiresAt'])
+          : null,
+      status: json['status'] ?? 'active',
+      severity: json['severity'],
+      type: json['type'],
+      zone: json['zone'],
+      buildingName: json['buildingName'],
+      cancelReason: json['cancelReason'],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -64,25 +93,14 @@ class Alert {
       'description': description,
       'latitude': latitude,
       'longitude': longitude,
-      'created_at': createdAt.toIso8601String(),
-      'expires_at': expiresAt?.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+      'expiresAt': expiresAt?.toIso8601String(),
       'status': status,
-      'cancel_reason': cancelReason,
+      'severity': severity,
+      'type': type,
+      'zone': zone,
+      'buildingName': buildingName,
+      'cancelReason': cancelReason,
     };
-  }
-
-  // Create Alert from JSON for API responses
-  factory Alert.fromJson(Map<String, dynamic> json) {
-    return Alert(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      latitude: json['latitude']?.toDouble() ?? 0.0,
-      longitude: json['longitude']?.toDouble() ?? 0.0,
-      createdAt: DateTime.parse(json['created_at']),
-      expiresAt: json['expires_at'] != null ? DateTime.parse(json['expires_at']) : null,
-      status: json['status'] ?? 'active',
-      cancelReason: json['cancel_reason'],
-    );
   }
 }

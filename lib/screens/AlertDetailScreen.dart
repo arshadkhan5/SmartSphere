@@ -52,7 +52,7 @@ class AlertDetailScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 16),
-                    _buildDetailRow(Icons.location_on, '${localizations.location}:', alert.location),
+                    _buildDetailRow(Icons.location_on, '${localizations.location}:', alert.latitude.toString()),
                     SizedBox(height: 8),
                     _buildDetailRow(Icons.access_time, '${localizations.created}:', _formatDateTime(alert.createdAt)),
                     if (alert.expiresAt != null)

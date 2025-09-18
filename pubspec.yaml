@@ -37,16 +37,20 @@ dependencies:
   dio: ^5.8.0+1
   flutter_riverpod: ^2.4.9
   google_maps_flutter: ^2.2.3
-  shared_preferences: ^2.2.2
+  timezone: ^0.10.1
 
-#  geolocator: ^9.0.2
-#  workmanager: ^0.5.1
-#  shared_preferences: ^2.2.2
-#  url_launcher: ^6.1.11
   http: ^1.1.0
   flutter_localizations:
     sdk: flutter
   intl: any
+  dart_nats: ^0.6.5
+  geolocator: ^14.0.2
+  flutter_foreground_task: ^9.1.0
+
+  flutter_background_service: ^5.1.0
+  flutter_local_notifications: ^19.4.1
+  shared_preferences: ^2.5.3
+  permission_handler: ^12.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -58,10 +62,6 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter packages.
 flutter:
   generate: true # Add this line
 

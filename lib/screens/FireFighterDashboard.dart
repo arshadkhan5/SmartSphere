@@ -1,11 +1,15 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:smart_sphere/screens/LoginScreen.dart';
 import '../l10n/app_localizations.dart';
 import '../model/Alert.dart';
 import '../providers/AlertServiceProvider.dart';
-import '../services/BackgroundService.dart';
-import '../services/NotificationService.dart';
+import '../services/backgroundService.dart';
 import 'AlertDetailScreen.dart';
 
 class FireFighterDashboard extends ConsumerStatefulWidget {
@@ -18,12 +22,34 @@ class FireFighterDashboard extends ConsumerStatefulWidget {
 class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _cancelReasonController = TextEditingController();
+  bool _isServiceRunning = false;
+  bool _isPermissionGranted = false;
+  StreamSubscription? _backgroundServiceSubscription;
 
   @override
-  void initState() {
+  void initState()  {
     super.initState();
+    // _initializeServices();
+
+
+
+    _initializeApp();
+    _setupBackgroundServiceListener();
     _tabController = TabController(length: 3, vsync: this);
-    _initializeServices();
+
+
+  }
+  void _setupBackgroundServiceListener() {
+    final service = FlutterBackgroundService();
+
+    _backgroundServiceSubscription = service.on('new_alert').listen((event) {
+      if (event != null) {
+        final alertData = event['alert'];
+        // Convert to Alert model and add to provider
+        final alert = Alert.fromJson(alertData);
+        ref.read(alertsProvider.notifier).addAlert(alert);
+      }
+    });
   }
 
   @override
@@ -33,24 +59,84 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
     super.dispose();
   }
 
-  Future<void> _initializeServices() async {
-    // Initialize notifications
-   // await NotificationService.initialize();
+  Future<void> _initializeApp() async {
+    await BackgroundServiceManager.initialize();
+    await _checkPermissions();
+    await _checkServiceStatus();
 
-    // Initialize background service
-   // await BackgroundService.initialize();
-
-    // Start background service for firefighters
-   // await BackgroundService.startBackgroundService();
+    await BackgroundServiceManager.initialize();
+    await BackgroundServiceManager.startService();
 
     // Load initial alerts
-    ref.read(alertsProvider.notifier).loadAlerts();
-
-    ref.read(backgroundServiceProvider.notifier).state = true;
+    ref.read(alertServiceProvider);
+    //_listenToBackgroundService();
   }
 
+
+
+  void _showPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Permissions Required'),
+        content: Text(
+            'This app requires notification and battery optimization permissions to work properly in the background.'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              openAppSettings();
+            },
+            child: Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _checkPermissions() async {
+    // Request necessary permissions
+    final permissions = [
+      Permission.notification,
+      Permission.ignoreBatteryOptimizations,
+      if (Platform.isAndroid) Permission.accessNotificationPolicy,
+    ];
+
+    Map<Permission, PermissionStatus> statuses = await permissions.request();
+
+    bool allGranted = statuses.values.every(
+            (status) => status == PermissionStatus.granted || status == PermissionStatus.limited
+    );
+
+    setState(() {
+      _isPermissionGranted = allGranted;
+    });
+
+    if (!allGranted) {
+      _showPermissionDialog();
+    } else {
+      // Start service if permissions are granted
+      await BackgroundServiceManager.startService();
+      await _checkServiceStatus();
+    }
+  }
+    Future<void> _checkServiceStatus() async {
+      bool isRunning = await BackgroundServiceManager.isServiceRunning();
+      setState(() {
+        _isServiceRunning = isRunning;
+      });
+    }
+
+
+
+
+
   void _handleAcceptAlert(Alert alert) {
-    // Update the alert status to "accepted"
     ref.read(alertsProvider.notifier).updateAlertStatus(alert.id, "accepted");
 
     // Navigate to the detail screen
@@ -91,7 +177,7 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
                   maxLines: 3,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return AppLocalizations.of(context)!.cancellationReasonRequired; // Add this to your localization
+                      return AppLocalizations.of(context)!.cancellationReasonRequired;
                     }
                     return null;
                   },
@@ -120,7 +206,6 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
                     SnackBar(content: Text('Alert cancelled')),
                   );
                 }
-                // No need for else block - the validator will show the error
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: Text(AppLocalizations.of(context)!.yesCancel, style: TextStyle(color: Colors.white)),
@@ -134,12 +219,11 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
   @override
   Widget build(BuildContext context) {
     final alerts = ref.watch(alertsProvider);
-    final backgroundServiceRunning = ref.watch(backgroundServiceProvider);
-
     // Filter alerts based on status
     final activeAlerts = alerts.where((alert) => alert.status == 'active').toList();
     final ignoredAlerts = alerts.where((alert) => alert.status == 'ignored').toList();
     final cancelledAlerts = alerts.where((alert) => alert.status == 'cancelled').toList();
+
 
     return Scaffold(
       appBar: AppBar(
@@ -150,7 +234,7 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
           decoration: const BoxDecoration(
               gradient: LinearGradient(
                   colors: [
-                    Color(0xFFFF0007), // Red
+                    Color(0xFFFF0007),
                     Color(0xFFFF0068),
                   ],
                   begin: Alignment.topCenter,
@@ -158,6 +242,9 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
               )
           ),
         ),
+        actions: [
+         
+        ],
         bottom: TabBar(
           controller: _tabController,
           labelStyle: TextStyle(
@@ -173,7 +260,7 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
           indicator: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
-              colors: [Color(0xFFEADADB), Color(0xFFFF0068)],
+                colors: [Color(0xFFEADADB), Color(0xFFFF0068)],
                 begin: Alignment.topRight,
                 end: Alignment.bottomCenter
             ),
@@ -185,101 +272,55 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
             Tab(text: "${AppLocalizations.of(context)!.ignored} (${ignoredAlerts.length})"),
             Tab(text: "${AppLocalizations.of(context)!.cancelled} (${cancelledAlerts.length})"),
           ],
-        )
-        /*TabBar(
-          controller: _tabController,
-          tabs: [
-          *//*  Tab(text: "${AppLocalizations.of(context)!.active} (${activeAlerts.length}) "),
-            Tab(text: "${AppLocalizations.of(context)!.ignored} (${ignoredAlerts.length})"),
-            Tab(text: "${AppLocalizations.of(context)!.cancelled} (${cancelledAlerts.length})"),*//*
-
-            Tab(
-              child: Text(
-                "${AppLocalizations.of(context)!.active} (${activeAlerts.length})",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16, // Adjust size as needed
-                ),
-              ),
-            ),
-            Tab(
-              child: Text(
-                "${AppLocalizations.of(context)!.ignored} (${ignoredAlerts.length})",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16, // Adjust size as needed
-                ),
-              ),
-            ),
-            Tab(
-              child: Text(
-                "${AppLocalizations.of(context)!.cancelled} (${cancelledAlerts.length})",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16, // Adjust size as needed
-                ),
-              ),
-            ),
-          ],
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withOpacity(0.7),
-        )*/,
-        actions: [
-          IconButton(
-            icon: Icon(backgroundServiceRunning ? Icons.notifications_active : Icons.notifications_off),
-            onPressed: () async {
-              if (backgroundServiceRunning) {
-              //  await BackgroundService.stopBackgroundService();
-                ref.read(backgroundServiceProvider.notifier).state = false;
-              } else {
-               // await BackgroundService.startBackgroundService();
-                ref.read(backgroundServiceProvider.notifier).state = true;
-              }
-            },
-          ),
-        ],
+        ),
 
       ),
       drawer: Drawer(
         child: ListView(
           children: [
             DrawerHeader(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [Color(0xFFFF0007), Color(0xFFFF0068)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter
+                ),
+              ),
               child: Container(
                 child: Column(
                   children: [
                     CircleAvatar(
                       radius: 40,
-                      backgroundImage: AssetImage("assets/splash_icon.png"),
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.local_fire_department, size: 40, color: Colors.red),
                     ),
-                    SizedBox(height: 20,),
-                    Text(AppLocalizations.of(context)!.fireTracker , style: TextStyle(fontWeight: FontWeight.bold),),
-
+                    SizedBox(height: 10),
+                    Text(AppLocalizations.of(context)!.fireTracker,
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
                   ],
                 ),
               ),
             ),
             ListTile(
-              leading: Icon ( Icons.home),
+              leading: Icon(Icons.home, color: Colors.red),
               title: Text("Home"),
-              onTap: (){
+              onTap: () {
                 Navigator.pop(context);
               },
-
             ),
             ListTile(
-              leading: Icon(Icons.settings),
+              leading: Icon(Icons.settings, color: Colors.red),
               title: Text("Setting"),
-              onTap: (){
+              onTap: () {
                 Navigator.pop(context);
-
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout),
+              leading: Icon(Icons.logout, color: Colors.red),
               title: Text(AppLocalizations.of(context)!.logOut),
-              onTap: (){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> LoginScreen()));
+              onTap: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen()));
               },
             )
           ],
@@ -296,7 +337,7 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
             showCancel: true,
           ),
 
-          // Rejected Tab
+          // Ignored Tab
           _buildAlertList(
             alerts: ignoredAlerts,
             showAccept: false,
@@ -315,7 +356,13 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
-        onPressed: () => ref.read(alertsProvider.notifier).loadAlerts(),
+        onPressed: () async {
+          // Clear and let AlertService re-populate
+          ref.read(alertsProvider.notifier).clearAlerts();
+          // Resubscribe manually (simulate refresh)
+          ref.read(alertServiceProvider);
+        },
+
         child: Icon(Icons.refresh, color: Colors.white),
       ),
     );
@@ -328,21 +375,40 @@ class _FireFighterDashboardState extends ConsumerState<FireFighterDashboard> wit
     required bool showCancel,
   }) {
     if (alerts.isEmpty) {
-      return Center(child: Text(AppLocalizations.of(context)!.noAlertFound));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.notifications_off, size: 64, color: Colors.redAccent),
+            SizedBox(height: 16),
+            Text(
+              AppLocalizations.of(context)!.noAlertFound,
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+          ],
+        ),
+      );
     }
 
-    return ListView.builder(
-      itemCount: alerts.length,
-      itemBuilder: (context, index) {
-        final alert = alerts[index];
-        return AlertCard(
-          alert: alert,
-          onAccept: showAccept ? () => _handleAcceptAlert(alert) : null,
-          onIgnore: showIgnore ? () => _handleIgnoreAlert(alert.id) : null,
-          onCancel: showCancel ? () => _handleCancelAlert(alert.id) : null,
-          showCancelReason: alert.status == 'cancelled',
-        );
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.read(alertsProvider.notifier).clearAlerts();
+        ref.read(alertServiceProvider);
       },
+
+      child: ListView.builder(
+        itemCount: alerts.length,
+        itemBuilder: (context, index) {
+          final alert = alerts[index];
+          return AlertCard(
+            alert: alert,
+            onAccept: showAccept ? () => _handleAcceptAlert(alert) : null,
+            onIgnore: showIgnore ? () => _handleIgnoreAlert(alert.id) : null,
+            onCancel: showCancel ? () => _handleCancelAlert(alert.id) : null,
+            showCancelReason: alert.status == 'cancelled',
+          );
+        },
+      ),
     );
   }
 }
@@ -365,29 +431,41 @@ class AlertCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Card(
       margin: EdgeInsets.all(12),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with status and priority
-            _buildHeader(context),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            left: BorderSide(
+              width: 6,
+              color: _getStatusColor(alert.status),
+            ),
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with status and priority
+              _buildHeader(context),
 
-            SizedBox(height: 16),
+              SizedBox(height: 16),
 
-            // Alert content
-            _buildAlertContent(context),
+              // Alert content
+              _buildAlertContent(context),
 
-            SizedBox(height: 16),
+              SizedBox(height: 16),
 
-            // Action buttons
-            if (onAccept != null || onIgnore != null || onCancel != null)
-              _buildActionButtons(context),
-          ],
+              // Action buttons
+              if (onAccept != null || onIgnore != null || onCancel != null)
+                _buildActionButtons(context),
+            ],
+          ),
         ),
       ),
     );
@@ -398,15 +476,15 @@ class AlertCard extends StatelessWidget {
       children: [
         // Status icon with color coding
         Container(
-          padding: EdgeInsets.all(6),
+          padding: EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: _getStatusColor(alert.status).withOpacity(0.2),
             shape: BoxShape.circle,
           ),
           child: Icon(
-            _getStatusIcon(alert.status ),
+            _getStatusIcon(alert.status),
             color: _getStatusColor(alert.status),
-            size: 20,
+            size: 24,
           ),
         ),
 
@@ -418,7 +496,7 @@ class AlertCard extends StatelessWidget {
             alert.title,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: 18,
               color: Colors.grey[800],
             ),
             overflow: TextOverflow.ellipsis,
@@ -427,16 +505,16 @@ class AlertCard extends StatelessWidget {
 
         // Status badge
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: _getStatusColor(alert.status).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
             alert.status.toUpperCase(),
             style: TextStyle(
               color: _getStatusColor(alert.status),
-              fontSize: 10,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -453,7 +531,7 @@ class AlertCard extends StatelessWidget {
         Text(
           alert.description,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             color: Colors.grey[700],
             height: 1.4,
           ),
@@ -461,15 +539,29 @@ class AlertCard extends StatelessWidget {
 
         SizedBox(height: 12),
 
+        // Alert details in a grid
+        Wrap(
+          spacing: 12,
+          runSpacing: 8,
+          children: [
+            if (alert.type != null) _buildDetailChip('Type', alert.type!, Icons.category),
+            if (alert.severity != null) _buildDetailChip('Severity', alert.severity!, Icons.warning),
+            if (alert.buildingName != null) _buildDetailChip('Building', alert.buildingName!, Icons.business),
+            if (alert.zone != null) _buildDetailChip('Zone', alert.zone!, Icons.map),
+          ],
+        ),
+
+        SizedBox(height: 12),
+
         // Location with map icon
         Row(
           children: [
-            Icon(Icons.location_on, size: 16, color: Colors.red),
-            SizedBox(width: 4),
+            Icon(Icons.location_on, size: 18, color: Colors.red),
+            SizedBox(width: 6),
             Expanded(
               child: Text(
                 '${alert.latitude.toStringAsFixed(4)}, ${alert.longitude.toStringAsFixed(4)}',
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
             ),
           ],
@@ -480,24 +572,24 @@ class AlertCard extends StatelessWidget {
         // Time information
         Row(
           children: [
-            Icon(Icons.access_time, size: 16, color: Colors.grey),
-            SizedBox(width: 4),
+            Icon(Icons.access_time, size: 18, color: Colors.grey),
+            SizedBox(width: 6),
             Text(
               '${AppLocalizations.of(context)!.created}: ${_formatTime(alert.createdAt)}',
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
           ],
         ),
 
         if (alert.expiresAt != null) ...[
-          SizedBox(height: 4),
+          SizedBox(height: 6),
           Row(
             children: [
-              Icon(Icons.timer, size: 16, color: Colors.orange),
-              SizedBox(width: 4),
+              Icon(Icons.timer, size: 18, color: Colors.orange),
+              SizedBox(width: 6),
               Text(
                 '${AppLocalizations.of(context)!.expired}: ${_formatTime(alert.expiresAt!)}',
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -511,29 +603,44 @@ class AlertCard extends StatelessWidget {
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Cancellation Reason:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                    color: Colors.grey[700],
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.info, size: 16, color: Colors.grey[700]),
+                    SizedBox(width: 6),
+                    Text(
+                      'Cancellation Reason:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: 6),
                 Text(
                   alert.cancelReason!,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildDetailChip(String label, String value, IconData icon) {
+    return Chip(
+      avatar: Icon(icon, size: 16, color: Colors.blue),
+      label: Text('$label: $value', style: TextStyle(fontSize: 12)),
+      backgroundColor: Colors.blue[50],
+      visualDensity: VisualDensity.compact,
     );
   }
 
@@ -544,59 +651,59 @@ class AlertCard extends StatelessWidget {
       buttons.add(
         Expanded(
           child: ElevatedButton.icon(
-            icon: Icon(Icons.check_circle, size: 18),
+            icon: Icon(Icons.check_circle, size: 20),
             onPressed: onAccept,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            label: Text(AppLocalizations.of(context)!.accepted, style: TextStyle(fontSize: 13)),
+            label: Text(AppLocalizations.of(context)!.accepted, style: TextStyle(fontSize: 14)),
           ),
         ),
       );
     }
 
     if (onIgnore != null) {
-      if (buttons.isNotEmpty) buttons.add(SizedBox(width: 8));
+      if (buttons.isNotEmpty) buttons.add(SizedBox(width: 12));
       buttons.add(
         Expanded(
           child: OutlinedButton.icon(
-            icon: Icon(Icons.remove_circle, size: 18, color: Colors.orange),
+            icon: Icon(Icons.remove_circle, size: 20, color: Colors.orange),
             onPressed: onIgnore,
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.orange,
-              padding: EdgeInsets.symmetric(vertical: 12),
-              side: BorderSide(color: Colors.orange),
+              padding: EdgeInsets.symmetric(vertical: 14),
+              side: BorderSide(color: Colors.orange, width: 2),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            label: Text(AppLocalizations.of(context)!.ignored, style: TextStyle(fontSize: 13)),
+            label: Text(AppLocalizations.of(context)!.ignored, style: TextStyle(fontSize: 14)),
           ),
         ),
       );
     }
 
     if (onCancel != null) {
-      if (buttons.isNotEmpty) buttons.add(SizedBox(width: 8));
+      if (buttons.isNotEmpty) buttons.add(SizedBox(width: 12));
       buttons.add(
         Expanded(
           child: OutlinedButton.icon(
-            icon: Icon(Icons.cancel, size: 18, color: Colors.red),
+            icon: Icon(Icons.cancel, size: 20, color: Colors.red),
             onPressed: onCancel,
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.red,
-              padding: EdgeInsets.symmetric(vertical: 12),
-              side: BorderSide(color: Colors.red),
+              padding: EdgeInsets.symmetric(vertical: 14),
+              side: BorderSide(color: Colors.red, width: 2),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            label: Text(AppLocalizations.of(context)!.cancelled, style: TextStyle(fontSize: 13)),
+            label: Text(AppLocalizations.of(context)!.cancelled, style: TextStyle(fontSize: 14)),
           ),
         ),
       );
@@ -619,7 +726,7 @@ class AlertCard extends StatelessWidget {
         '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 
-  IconData _getStatusIcon(String status  ) {
+  IconData _getStatusIcon(String status) {
     switch (status.toLowerCase()) {
       case 'active':
         return Icons.warning;
@@ -637,7 +744,7 @@ class AlertCard extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return Colors.orange;
+        return Colors.green;
       case 'accepted':
         return Colors.green;
       case 'ignored':
@@ -649,3 +756,4 @@ class AlertCard extends StatelessWidget {
     }
   }
 }
+
