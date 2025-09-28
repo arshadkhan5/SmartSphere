@@ -1,13 +1,16 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
 import 'package:smart_sphere/model/CreateAlertModel.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/CreateAlertProvider.dart';
+import '../services/FirestoreService.dart';
 import '../services/NatService.dart';
 
 class CreateAlertScreen extends ConsumerStatefulWidget {
-  const CreateAlertScreen({super.key});
+  final String customerId;
+  const CreateAlertScreen({super.key ,  required this.customerId});
 
   @override
   ConsumerState<CreateAlertScreen> createState() => _CreateAlertScreenState();
@@ -26,6 +29,32 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
   String _selectFireFighter = "Fire Fighter 1";
   String _selectZone= "None";
   String _selectBuildingName = "Al Mousa Tower";
+  String _targetRole = "firefighter"; // default
+
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    FirebaseMessaging.instance.subscribeToTopic("user_${widget.customerId}");
+  }
+  // Firestore Alerts
+  void _createFireAlert() {
+    FirestoreService.createAlert(
+      type: "Fire",
+      targetRole: "firefighter",
+      customerId: widget.customerId,
+    );
+  }
+
+  void _createAccidentAlert() {
+    FirestoreService.createAlert(
+      type: "Accident",
+      targetRole: "ambulance",
+      customerId: widget.customerId,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -243,6 +272,53 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
+              const SizedBox(height: 15),
+              DropdownButtonFormField<String>(
+                value: _targetRole,
+                items: const [
+                  DropdownMenuItem(value: "ambulance", child: Text("🚑 Ambulance")),
+                  DropdownMenuItem(value: "firefighter", child: Text("🔥 Firefighter")),
+                  DropdownMenuItem(value: "both", child: Text("🚑 + 🔥 Both")),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _targetRole = value!;
+                  });
+                },
+                decoration: InputDecoration(
+                  labelText: "Send Alert To",
+                  labelStyle: const TextStyle(
+                    color: Colors.purple,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  filled: true,
+                  fillColor: Colors.purple.shade50,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.purple, width: 2),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.purpleAccent, width: 2),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.purpleAccent, width: 2),
+                  ),
+                ),
+                dropdownColor: Colors.white,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                icon: const Icon(
+                  Icons.arrow_drop_down_circle,
+                  color: Colors.purple,
+                ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+
 
               const SizedBox(height: 15),
               _buildTextField(_descriptionController, AppLocalizations.of(context)!.description, maxLines: 4),
@@ -318,6 +394,79 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
   void _submitAlertToNats() async {
     if (_formKey.currentState!.validate()) {
       try {
+      /*  final alertData = {
+          "title": _titleController.text.trim(),
+          "description": _descriptionController.text.trim(),
+          "buildingName": _selectBuildingName,
+          "zone": _selectZone,
+          "severity": _severityLevel,
+          "type": _selectedType,
+          "createdAt": DateTime.now().toIso8601String(),
+          "status": "active",
+          "id": DateTime.now().millisecondsSinceEpoch.toString(),
+        };*/
+
+        // ✅ Check selected target role
+        if (_targetRole == "ambulance") {
+          await FirestoreService.createAlert(
+            type: _selectedType,
+            targetRole: "ambulance",
+            customerId: widget.customerId,
+          );
+          const SnackBar(content: Text("✅ Alert created successfully"));
+
+    } else if (_targetRole == "firefighter") {
+          await FirestoreService.createAlert(
+            type: _selectedType,
+            targetRole: "firefighter",
+            customerId: widget.customerId,
+          );
+          const SnackBar(content: Text("✅ Alert created successfully"));
+
+    } else if (_targetRole == "both") {
+          await FirestoreService.createAlert(
+            type: _selectedType,
+            targetRole: "ambulance",
+            customerId: widget.customerId,
+          );
+          await FirestoreService.createAlert(
+            type: _selectedType,
+            targetRole: "firefighter",
+            customerId: widget.customerId,
+          );
+          const SnackBar(content: Text("✅ Alert created successfully"));
+
+    }
+
+        // ✅ Publish to NATS (optional, if you need role-specific subjects)
+        /*await NatsService.publishAlert("alerts.create", alertData);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("✅ Alert created successfully")),
+          );
+          _titleController.clear();
+          _descriptionController.clear();
+          setState(() {
+            _selectedType = "Fire";
+            _severityLevel = "Low";
+            _selectZone = "None";
+            _selectBuildingName = "Al Mousa Tower";
+            _targetRole = "firefighter"; // reset to default
+          });
+        }*/
+      } catch (e) {
+        print("❌ Failed to send alert: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("⚠️ Failed to send alert. Please try again.")),
+        );
+      }
+    }
+  }
+
+ /* void _submitAlertToNats() async {
+    if (_formKey.currentState!.validate()) {
+      try {
         // ✅ Create a complete alert object with all fields
         final alertData = {
           "title": _titleController.text.trim(),
@@ -376,7 +525,7 @@ class _CreateAlertScreenState extends ConsumerState<CreateAlertScreen> {
         );
       }
     }
-  }
+  }*/
 }
 
 

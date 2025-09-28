@@ -6,9 +6,12 @@ import 'package:smart_sphere/screens/FireFighterScreen.dart';
 import '../l10n/app_localizations.dart'; // Your existing map screen
 
 class AlertDetailScreen extends StatelessWidget {
-  final Alert alert;
+  final String customerId;
+  final String responderId;
 
-  const AlertDetailScreen({super.key, required this.alert});
+  const AlertDetailScreen({super.key,
+    required this.customerId,
+    required this.responderId,});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +38,7 @@ class AlertDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Alert Information
-            Card(
+         /*   Card(
               elevation: 4,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -68,7 +71,7 @@ class AlertDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
+            ),*/
 
             SizedBox(height: 24),
 
@@ -111,12 +114,12 @@ class AlertDetailScreen extends StatelessWidget {
             Center(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.push(
+               /*   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => FireFighterScreen(alert: alert),
                     ),
-                  );
+                  );*/
                 },
                 icon: Icon(Icons.map, color: Colors.white),
                 label: Text(localizations.trackLocationMap, style: TextStyle(color: Colors.white)),

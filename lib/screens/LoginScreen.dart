@@ -44,7 +44,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(AppLocalizations.of(context)!.logIn ,style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold),),
+              child: Text(AppLocalizations.of(context)!.logIn ,
+                style: TextStyle(color: Colors.white , fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -170,20 +172,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               if (formKey.currentState!.validate()) {
                                 String username = usernameController.text.trim().toLowerCase();
                                 String password = passwordController.text.trim();
-                
+
+
                                 if (username == 'customer' && password == '1234') {
-                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => CustomerScreen()));
+                                  List<String> _subTopics = ["firefighter1", "ambulance1"];
+                                  List<String> _publishTopics = ["firefighter1", "ambulance1"];
+                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => CustomerScreen(customerId: username, stopics: _subTopics, ptopics: _publishTopics,)));
                                 }
                                 else if (username == 'firefighter' && password == '1234') {
-                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => FireFighterDashboard()));
+
+                                  List<String> _publishTopics = [ "firefighter1"];
+                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => FireFighterDashboard(firefighterId:username ,)));
                                 }
                                 else if (username == 'ambulance' && password == '1234') {
-                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AmbulanceScreen()));
+
+                                  List<String> _publishTopics = [ "ambulance1"];
+                                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AmbulanceScreen(ambulanceId: username,)));
                                 }
                                 else if (username == 'admin' && password == '1234') {
+
+                                  List<String> _subTopics = ["firefighter1", "ambulance1"];
                                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AdminScreen()));
                                 }
                                 else if (username == 'operation' && password == '1234') {
+
+                                  List<String> _subTopics = ["firefighter1", "ambulance1"];
                                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => OperationTeamScreen()));
                                 }
                                 else {
